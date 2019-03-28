@@ -1,0 +1,44 @@
+#version 330 core
+
+in vec3 Normal;
+in vec3 FragPos;
+
+out vec4 FragColor;
+vec4 objectColor = vec4(0.0, 0.0, 1.0, 1.0);
+uniform vec3 source;
+uniform vec3 lightPos;
+
+void main()
+{
+    if(source.x == 1 && source.y == 1 && source.z == 1)
+    {
+        vec3 lightColor = vec3(1.0, 1.0, 1.0);
+        float ambientStrength = 0.4;
+        float diffuseStrength = 0.6;
+
+        vec3 lightVector = normalize(lightPos - FragPos);
+        float distance = length(lightPos - FragPos);
+
+        vec3 ambient = lightColor * ambientStrength;
+
+        vec3 reflection = reflect(lightVector, Normal);
+
+        float diffuse = max(0, dot(normalize(Normal), lightVector));
+
+        float alpha = 100;
+
+        vec3 view = vec3(0, 0, 1);
+
+        float specular = pow(max(0, dot(view, reflection)), alpha);
+
+        float distanceAttenuation = 1/(1 + 0.1 * distance + 0.05 * distance * distance);
+
+        FragColor = objectColor * vec4(ambient, 1.0) +
+                    distanceAttenuation * diffuse * objectColor * diffuseStrength +
+                    distanceAttenuation* objectColor * specular;
+    }
+    else
+    {
+        FragColor = objectColor*vec4(0.1, 0.1, 0.1, 1.0f);
+    }
+}

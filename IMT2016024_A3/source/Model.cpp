@@ -1,6 +1,7 @@
 #include "../include/Model.h"
 
 Model::Model(){
+    on = 0;
     selected = 0;
     translation = glm::mat4(1.0);
     rotation = glm::mat4(1.0);
@@ -67,6 +68,11 @@ void Model::scaleModel(int t){
             scale = glm::scale(scale, glm::vec3(0.9f, 0.9f, 0.9f));
         }
     }
+}
+
+void Model::changeLight()
+{
+    on = !on;
 }
 
 void Model::drag(glm::vec3 pos){
@@ -319,7 +325,22 @@ void Model::display(GLuint shaderID, int mode){
     GLuint uniformModel = glGetUniformLocation(shaderID, "model");
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
-    glm::vec3 source = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, -1.0f);
+    lightPos = glm::vec3(translation * glm::vec4(lightPos, 1.0f));
+
+    GLuint uniformlightPos = glGetUniformLocation(shaderID, "lightPos");
+    glUniform3fv(uniformlightPos, 1, glm::value_ptr(lightPos));
+
+    glm::vec3 source;
+
+    if(!on)
+    {
+        source = glm::vec3(0.0f, 0.0f, 0.0f);
+    }
+    else
+    {
+        source = glm::vec3(1.0f, 1.0f, 1.0f);
+    }
 
     GLuint uniformsource = glGetUniformLocation(shaderID, "source");
     glUniform3fv(uniformsource, 1, glm::value_ptr(source));
