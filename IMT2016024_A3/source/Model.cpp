@@ -5,9 +5,16 @@ Model::Model(){
     selected = 0;
     translation = glm::mat4(1.0);
     rotation = glm::mat4(1.0);
-    scale = glm::mat4(1.0);
-    scale = glm::scale(scale, glm::vec3(0.6f, 0.6f, 0.6f));
+    scale = glm::scale(glm::mat4(1.0), glm::vec3(0.3f, 0.3f, 0.3f));
 };
+
+Model::Model(float x, float y){
+    on = 0;
+    selected = 0;
+    translation = glm::translate(glm::mat4(1.0), glm::vec3(x, y, 0.0));
+    rotation = glm::mat4(1.0);
+    scale = glm::scale(glm::mat4(1.0), glm::vec3(0.45f, 0.45f, 0.45f));
+}
 
 Model::Model(const Model &m){
     VAO = m.VAO;
@@ -25,6 +32,9 @@ Model::Model(const Model &m){
     max_y = m.max_y;
     max_z = m.max_z;
     selectPos = m.selectPos;
+}
+void Model::setTexture(const string &path){
+    texture.create(path);
 }
 
 void Model::setTranslation(glm::mat4 mat){
@@ -51,13 +61,11 @@ void Model::setSelected(int t, glm::vec3 pos){
 
     glm::vec4 orig_pos = glm::vec4(inv*glm::vec4(pos,1.0));
 
-    if(min_x <= orig_pos.x and max_x >= orig_pos.x and min_y <= orig_pos.y and max_y >= orig_pos.y and min_z <= orig_pos.z and max_z >= orig_pos.z){
+    if(min_x - 0.01 <= orig_pos.x and max_x + 0.01 >= orig_pos.x and min_y - 0.01 <= orig_pos.y and max_y + 0.01 >= orig_pos.y and min_z - 0.01 <= orig_pos.z and max_z + 0.01 >= orig_pos.z){
         selected = t;
         selectPos = pos;
     }
 }
-
-
 
 void Model::scaleModel(int t){
     if(selected){

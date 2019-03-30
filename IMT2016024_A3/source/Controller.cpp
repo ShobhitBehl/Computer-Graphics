@@ -40,7 +40,12 @@ void Controller::handleKeys(GLFWwindow* window, int key, int code, int action, i
 	else if(key == GLFW_KEY_2 and action == GLFW_PRESS){
 		scene.changeLight(1);
 	}
-	
+	else if(key == GLFW_KEY_3 and action == GLFW_PRESS){
+		scene.changeLight(2);
+	}
+	else if(key == GLFW_KEY_4 and action == GLFW_PRESS){
+		scene.changeLight(3);
+	}	
 }
 
 void Controller::handleClick(GLFWwindow* window, int button, int action, int mods){
@@ -49,12 +54,12 @@ void Controller::handleClick(GLFWwindow* window, int button, int action, int mod
 
 	float win_x, win_y, win_z;
     win_x = cursor_x;
-    win_y = 800 - cursor_y;
+    win_y = 1000 - cursor_y;
 
 	glReadPixels(int(win_x), int(win_y), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &win_z);
 	
-	win_x = win_x/400 - 1;
-	win_y = win_y/400 - 1;
+	win_x = win_x/500 - 1;
+	win_y = win_y/500 - 1;
 	win_z = 2*win_z - 1;
 	
 	glm::vec3 pos = glm::vec3(win_x, win_y, win_z);
@@ -73,12 +78,12 @@ void Controller::handleClick(GLFWwindow* window, int button, int action, int mod
 void Controller::handleDrag(GLFWwindow* window, double cursor_x, double cursor_y){
 	float win_x, win_y, win_z;
     win_x = cursor_x;
-    win_y = 800 - cursor_y;
+    win_y = 1000 - cursor_y;
 
 	glReadPixels(int(win_x), int(win_y), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &win_z);
 	
-	win_x = win_x/400 - 1;
-	win_y = win_y/400 - 1;
+	win_x = win_x/500 - 1;
+	win_y = win_y/500 - 1;
 	win_z = 2*win_z - 1;
 	
     glm::vec3 pos = glm::vec3(win_x, win_y, win_z);
@@ -106,7 +111,10 @@ void Controller::display(){
 	shader.createShader();
 
 	scene.addModel("./data/beethoven.ply");
-    scene.addModel("./data/sphere.ply");
+	scene.addModel("./data/mug.ply");
+	scene.addModel("./data/sphere.ply");
+	scene.addModel("./data/cube.ply");
+	scene.setTexture("./textures/wood.jpeg", 0);
     
     Controller* controller = this;
 

@@ -56,12 +56,12 @@ void Parser::normalize(vector <Vertex> &vertices){
     max_num = max_float(max_num, abs(min_y));
     max_num = max_float(max_num, abs(min_z));
 
-    min_x = min_x/(max_num*1.0f);
-    min_y = min_y/(max_num*1.0f);
-    min_z = min_z/(max_num*1.0f);
-    max_x = max_x/(max_num*1.0f);
-    max_y = max_y/(max_num*1.0f);
-    max_z = max_z/(max_num*1.0f);
+    min_x = min_x/(max_num*2.0f);
+    min_y = min_y/(max_num*2.0f);
+    min_z = min_z/(max_num*2.0f);
+    max_x = max_x/(max_num*2.0f);
+    max_y = max_y/(max_num*2.0f);
+    max_z = max_z/(max_num*2.0f);
 
     float mid_x = (min_x + max_x) / 2;
     float mid_y = (min_y + max_y) / 2;
@@ -69,7 +69,7 @@ void Parser::normalize(vector <Vertex> &vertices){
 
     for(int i = 0; i < num_vertices; i++){
         glm::vec3 pos = vertices[i].getPosition();
-        pos = pos/(max_num*1.0f);
+        pos = pos/(max_num*2.0f);
         pos.x -= mid_x;
         pos.y -= mid_y;
         pos.z -= mid_z;

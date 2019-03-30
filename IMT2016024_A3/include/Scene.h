@@ -13,6 +13,7 @@ public:
 	Scene();
 	void setSelected(int t, glm::vec3 pos);
 	void scale(int t);
+	void setTexture(const string &path, int index);
 	void translateLightPos(int mode);
 	void drag(glm::vec3 pos);
 	void addModel(string filename);

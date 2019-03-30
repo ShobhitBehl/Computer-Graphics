@@ -16,6 +16,12 @@ void Scene::setSelected(int t, glm::vec3 pos){
     }
 }
 
+void Scene::setTexture(const string &path, int index){
+    if(index < num_models){
+        models[index].setTexture(path);
+    }
+}
+
 void Scene::scale(int t){
     for(int i = 0; i<num_models; i++)
     {
@@ -67,7 +73,8 @@ void Scene::drag(glm::vec3 pos){
 }
 
 void Scene::addModel(string filename){
-    Model m;
+    float x = 0.5, y = 0.5;
+    Model m((num_models - 2)*x + 0.25, 0.0);
     m.construct(filename);
     models[num_models] = m;
     num_models++;
