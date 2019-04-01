@@ -110,11 +110,16 @@ void Controller::display(){
 	Shader shader("shaders/vert_shader", "shaders/frag_shader");
 	shader.createShader();
 
-	scene.addModel("./data/beethoven.ply");
-	scene.addModel("./data/mug.ply");
+	Texture texture1;
+	texture1.create("./textures/Chessboard.png");
+	texture1.bind(0);
+
+	// scene.addModel("./data/beethoven.ply");
+	// scene.addModel("./data/mug.ply");
 	scene.addModel("./data/sphere.ply");
-	scene.addModel("./data/cube.ply");
-	scene.setTexture("./textures/wood.jpeg", 0);
+	// scene.addModel("./data/cube.ply");
+
+	scene.setTexture(0, 0);
     
     Controller* controller = this;
 

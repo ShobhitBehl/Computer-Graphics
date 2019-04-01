@@ -2,11 +2,16 @@
 
 in vec3 Normal;
 in vec3 FragPos;
+in vec2 texCoord;
 
 out vec4 FragColor;
-vec4 objectColor = vec4(0.0, 0.0, 1.0, 1.0);
 uniform vec3 source;
 uniform vec3 lightPos;
+uniform sampler2D textureID;
+
+vec4 objectColor = texture(textureID, texCoord);
+//vec4 objectColor = vec4(0.0, 0.0, 1.0, 1.0);
+//vec4 objectColor = vec4(textureID, 0.0, 0.0, 1.0);
 
 void main()
 {

@@ -13,19 +13,22 @@ private:
 	glm::vec3 selectPos;
 	vector <Vertex> vertices;
 	vector <GLuint> indices;
-	Texture texture;
+	int textureID;
 
 public:
 	Model();
 	Model(float x, float y);
 	Model(const Model &m);
 	void setSelected(int t, glm::vec3 pos);
-	void setTexture(const string &path);
+	void setTexture(int tex);
 	void setTranslation(glm::mat4 mat);
 	void setRotation(glm::mat4 mat);
 	void setScale(glm::mat4 mat);
 	void scaleModel(int t);
 	void changeLight();
+	void linearTexture();
+	void cylindricalTexture();
+	void sphericalTexture();
 	void drag(glm::vec3 pos);
 	void calcNormals();
 	void splat();

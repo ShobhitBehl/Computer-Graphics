@@ -33,8 +33,8 @@ Model::Model(const Model &m){
     max_z = m.max_z;
     selectPos = m.selectPos;
 }
-void Model::setTexture(const string &path){
-    texture.create(path);
+void Model::setTexture(int tex){
+    textureID = tex;
 }
 
 void Model::setTranslation(glm::mat4 mat){
@@ -78,10 +78,31 @@ void Model::scaleModel(int t){
     }
 }
 
-void Model::changeLight()
-{
+void Model::changeLight(){
     on = !on;
 }
+
+void Model::linearTexture(){
+    for(int i = 0; i<num_vertices; i++)
+    {
+        glm::vec2 tex;
+        glm::vec3 pos = vertices[i].getPosition();
+        tex.x = (pos.x - min_x) / (max_x - min_x);
+        tex.y = (pos.y - min_y) / (max_y - min_y);
+        vertices[i].setTexture(tex);
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, num_vertices*sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+}
+
+void Model::cylindricalTexture(){
+
+}
+
+void Model::sphericalTexture(){
+
+}
+
 
 void Model::drag(glm::vec3 pos){
     if(selected == 1){
@@ -306,18 +327,19 @@ void Model::construct(string filename){
 
 	glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, num_vertices*sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+    //glBufferData(GL_ARRAY_BUFFER, num_vertices*sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),  (void*)(3*sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3*sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(6*sizeof(float)));
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
     
     glGenBuffers(1, &IBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*num_indices*sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
-
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -338,6 +360,9 @@ void Model::display(GLuint shaderID, int mode){
 
     GLuint uniformlightPos = glGetUniformLocation(shaderID, "lightPos");
     glUniform3fv(uniformlightPos, 1, glm::value_ptr(lightPos));
+
+    GLuint uniformTexture = glGetUniformLocation(shaderID, "textureID");
+    glUniform1i(uniformTexture, textureID);
 
     glm::vec3 source;
 

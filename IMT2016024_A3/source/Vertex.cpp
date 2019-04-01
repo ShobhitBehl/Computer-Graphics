@@ -12,7 +12,7 @@ Vertex::Vertex( glm::vec3 pos ){
 Vertex::Vertex(const Vertex &v){
     position = v.position;
     normal = v.normal;
-    color = v.color;
+    texture = v.texture;
 }
 
 glm::vec3 Vertex::getPosition(){
@@ -23,8 +23,8 @@ glm::vec3 Vertex::getNormal(){
     return normal;
 }
 
-glm::vec3 Vertex::getColor(){
-    return color;
+glm::vec2 Vertex::getTexture(){
+    return texture;
 }
 
 void Vertex::setPosition(glm::vec3 vec){
@@ -35,6 +35,6 @@ void Vertex::setNormal(glm::vec3 vec){
     normal = vec;
 }
 
-void Vertex::setColor(glm::vec3 vec){
-    color = vec;
+void Vertex::setTexture(glm::vec2 vec){
+    texture = vec;
 }

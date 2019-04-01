@@ -16,9 +16,9 @@ void Scene::setSelected(int t, glm::vec3 pos){
     }
 }
 
-void Scene::setTexture(const string &path, int index){
+void Scene::setTexture(int tex, int index){
     if(index < num_models){
-        models[index].setTexture(path);
+        models[index].setTexture(tex);
     }
 }
 
@@ -77,6 +77,7 @@ void Scene::addModel(string filename){
     Model m((num_models - 2)*x + 0.25, 0.0);
     m.construct(filename);
     models[num_models] = m;
+    models[num_models].linearTexture();
     num_models++;
 }
 

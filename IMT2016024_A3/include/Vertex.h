@@ -11,16 +11,16 @@ class Vertex{
 private:
 	glm::vec3 position;
 	glm::vec3 normal;
-	glm::vec3 color;
+	glm::vec2 texture;
 
 public:
 	Vertex();
 	Vertex(glm::vec3 pos);
 	Vertex(const Vertex &v);
 	glm::vec3 getPosition();
-	glm::vec3 getColor();
+	glm::vec2 getTexture();
 	glm::vec3 getNormal();
 	void setPosition(glm::vec3 vec);
-	void setColor(glm::vec3 vec);
+	void setTexture(glm::vec2 vec);
 	void setNormal(glm::vec3 vec);
 };
