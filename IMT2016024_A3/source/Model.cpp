@@ -1,8 +1,12 @@
 #include "../include/Model.h"
 
+#define PI 3.141592654
+
 Model::Model(){
     on = 0;
     selected = 0;
+    textureID = 0;
+    mappingID = 0;
     translation = glm::mat4(1.0);
     rotation = glm::mat4(1.0);
     scale = glm::scale(glm::mat4(1.0), glm::vec3(0.3f, 0.3f, 0.3f));
@@ -11,6 +15,8 @@ Model::Model(){
 Model::Model(float x, float y){
     on = 0;
     selected = 0;
+    textureID = 0;
+    mappingID = 0;
     translation = glm::translate(glm::mat4(1.0), glm::vec3(x, y, 0.0));
     rotation = glm::mat4(1.0);
     scale = glm::scale(glm::mat4(1.0), glm::vec3(0.45f, 0.45f, 0.45f));
@@ -33,8 +39,11 @@ Model::Model(const Model &m){
     max_z = m.max_z;
     selectPos = m.selectPos;
 }
-void Model::setTexture(int tex){
-    textureID = tex;
+
+void Model::changeTexture(){
+    if(selected == 1){
+        textureID = (textureID + 1)%4;
+    }
 }
 
 void Model::setTranslation(glm::mat4 mat){
@@ -82,9 +91,8 @@ void Model::changeLight(){
     on = !on;
 }
 
-void Model::linearTexture(){
-    for(int i = 0; i<num_vertices; i++)
-    {
+void Model::planarTexture(){
+    for(int i = 0; i<num_vertices; i++){
         glm::vec2 tex;
         glm::vec3 pos = vertices[i].getPosition();
         tex.x = (pos.x - min_x) / (max_x - min_x);
@@ -96,13 +104,64 @@ void Model::linearTexture(){
 }
 
 void Model::cylindricalTexture(){
-
+    for(int i = 0; i<num_vertices; i++){
+        glm::vec2 tex;
+        glm::vec3 pos = vertices[i].getPosition();
+        tex.x = (PI + atan2(pos.y, pos.x))  / (2*PI);
+        tex.y = (pos.z - min_z) / (max_z - min_z);
+        vertices[i].setTexture(tex);
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, num_vertices*sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 }
 
 void Model::sphericalTexture(){
+    float radius = -1;
+    for(int i = 0; i<num_vertices; i++)
+    {
+        glm::vec3 pos = vertices[i].getPosition();
+        float tempr = sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z );
+        if(tempr > radius)
+        {
+            radius = tempr;
+        }
+    }
 
+    for(int i = 0; i<num_vertices; i++){
+        glm::vec2 tex;
+        glm::vec3 pos = vertices[i].getPosition();
+
+        tex.x = acos(-pos.x / radius) / PI;
+
+        if(sin(PI * tex.x) == 0){
+            tex.y = 1;
+        } 
+        else if(pos.y < 0){
+            tex.y = acos(pos.z / (radius * sin(PI * tex.x))) / (2*PI);
+        }
+        else{
+            tex.y = (2*PI - acos(pos.z / (radius * sin(PI * tex.x)))) / (2*PI);
+        }
+        vertices[i].setTexture(tex);
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, num_vertices*sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 }
 
+void Model::changeMapping(){
+    if(selected == 1){
+        mappingID = (mappingID + 1)%3;
+        if(mappingID == 0){
+            planarTexture();
+        }
+        else if(mappingID == 1){
+            cylindricalTexture();
+        }
+        else if(mappingID == 2){
+            sphericalTexture();
+        }
+    }
+}
 
 void Model::drag(glm::vec3 pos){
     if(selected == 1){
@@ -327,7 +386,6 @@ void Model::construct(string filename){
 
 	glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    //glBufferData(GL_ARRAY_BUFFER, num_vertices*sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3*sizeof(float)));

@@ -13,10 +13,11 @@ public:
 	Scene();
 	void setSelected(int t, glm::vec3 pos);
 	void scale(int t);
-	void setTexture(int tex, int index);
+	void changeTexture();
 	void translateLightPos(int mode);
 	void drag(glm::vec3 pos);
 	void addModel(string filename);
 	void display(GLuint shaderId);
 	void changeLight(int index);
+	void changeMapping();
 };

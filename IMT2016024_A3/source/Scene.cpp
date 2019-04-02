@@ -16,9 +16,9 @@ void Scene::setSelected(int t, glm::vec3 pos){
     }
 }
 
-void Scene::setTexture(int tex, int index){
-    if(index < num_models){
-        models[index].setTexture(tex);
+void Scene::changeTexture(){
+    for(int i = 0; i<num_models; i++){
+        models[i].changeTexture();
     }
 }
 
@@ -72,12 +72,18 @@ void Scene::drag(glm::vec3 pos){
     }
 }
 
+void Scene::changeMapping(){
+    for(int i = 0; i<num_models; i++){
+        models[i].changeMapping();
+    }
+}
+
 void Scene::addModel(string filename){
     float x = 0.5, y = 0.5;
     Model m((num_models - 2)*x + 0.25, 0.0);
     m.construct(filename);
     models[num_models] = m;
-    models[num_models].linearTexture();
+    models[num_models].planarTexture();
     num_models++;
 }
 

@@ -45,7 +45,13 @@ void Controller::handleKeys(GLFWwindow* window, int key, int code, int action, i
 	}
 	else if(key == GLFW_KEY_4 and action == GLFW_PRESS){
 		scene.changeLight(3);
-	}	
+	}
+	else if(key == GLFW_KEY_M and action == GLFW_PRESS){
+		scene.changeMapping();
+	}
+	else if(key == GLFW_KEY_T and action == GLFW_PRESS){
+		scene.changeTexture();
+	}
 }
 
 void Controller::handleClick(GLFWwindow* window, int button, int action, int mods){
@@ -110,16 +116,24 @@ void Controller::display(){
 	Shader shader("shaders/vert_shader", "shaders/frag_shader");
 	shader.createShader();
 
-	Texture texture1;
-	texture1.create("./textures/Chessboard.png");
-	texture1.bind(0);
-
-	// scene.addModel("./data/beethoven.ply");
-	// scene.addModel("./data/mug.ply");
+	glEnable(GL_TEXTURE_2D);
+	
+	scene.addModel("./data/beethoven.ply");
+	scene.addModel("./data/cylinder.ply");
 	scene.addModel("./data/sphere.ply");
-	// scene.addModel("./data/cube.ply");
+	scene.addModel("./data/cube.ply");
 
-	scene.setTexture(0, 0);
+	Texture texture1, texture2, texture3, texture4;
+
+	texture1.create("./textures/wood.jpeg");
+	texture2.create("./textures/chessboard.png");
+	texture3.create("./textures/obama.png");
+	texture4.create("./textures/worldmap.png");
+	
+	texture1.bind(0);
+	texture2.bind(1);
+	texture3.bind(2);
+	texture4.bind(3);
     
     Controller* controller = this;
 

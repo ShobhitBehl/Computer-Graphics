@@ -1,6 +1,5 @@
 #include "../include/Shader.h"
 #include "../include/Parser.h"
-#include "../include/Texture.h"
 
 using namespace std;
 
@@ -14,19 +13,20 @@ private:
 	vector <Vertex> vertices;
 	vector <GLuint> indices;
 	int textureID;
+	int mappingID;
 
 public:
 	Model();
 	Model(float x, float y);
 	Model(const Model &m);
 	void setSelected(int t, glm::vec3 pos);
-	void setTexture(int tex);
+	void changeTexture();
 	void setTranslation(glm::mat4 mat);
 	void setRotation(glm::mat4 mat);
 	void setScale(glm::mat4 mat);
 	void scaleModel(int t);
 	void changeLight();
-	void linearTexture();
+	void planarTexture();
 	void cylindricalTexture();
 	void sphericalTexture();
 	void drag(glm::vec3 pos);
@@ -34,4 +34,5 @@ public:
 	void splat();
 	void construct(string filename);
 	void display(GLuint shaderId, int mode);
+	void changeMapping();
 };
