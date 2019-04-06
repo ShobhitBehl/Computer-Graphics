@@ -7,25 +7,25 @@ class Model{
 private:
 	GLuint VAO, VBO, IBO;
 	glm::mat4 translation, rotation, scale;
-	int num_vertices,num_indices,selected, on;
+	int num_vertices,num_indices,selected,on;
 	float min_x, max_x, min_y, max_y, min_z, max_z;
 	glm::vec3 selectPos;
 	vector <Vertex> vertices;
 	vector <GLuint> indices;
-	int textureID;
-	int mappingID;
+	int textureID, mappingID, modelnum;
+	vector <Model*> children;
 
 public:
-	Model();
-	Model(float x, float y);
+	Model(int mn);
+	Model(float x, float y, int mn, float sc);
 	Model(const Model &m);
-	void setSelected(int t, glm::vec3 pos);
+	void setSelected(int t, glm::vec3 pos, glm::mat4 worldMatrix);
 	void changeTexture();
 	void setTranslation(glm::mat4 mat);
 	void setRotation(glm::mat4 mat);
 	void setScale(glm::mat4 mat);
 	void scaleModel(int t);
-	void changeLight();
+	void changeLight(int index);
 	void planarTexture();
 	void cylindricalTexture();
 	void sphericalTexture();
@@ -33,6 +33,8 @@ public:
 	void calcNormals();
 	void splat();
 	void construct(string filename);
-	void display(GLuint shaderId, int mode);
+	void display(GLuint shaderId, int mode, glm::mat4 worldMatrix);
 	void changeMapping();
+	void addChild(Model * m, int index);
+	void rotate();
 };

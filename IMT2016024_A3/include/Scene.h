@@ -4,10 +4,10 @@ using namespace std;
 
 class Scene{
 private:
-	Model models[500];
-	int num_models;
+	vector <Model> models;
 	glm::vec3 lightPos;
 	GLuint lightVBO, lightVAO;
+	int modelnum;
 
 public:
 	Scene();
@@ -16,7 +16,8 @@ public:
 	void changeTexture();
 	void translateLightPos(int mode);
 	void drag(glm::vec3 pos);
-	void addModel(string filename);
+	void addModel(string filename, float x, float y, float sc);
+	void addChildToModel(int index, string filename, float x, float y, float sc);
 	void display(GLuint shaderId);
 	void changeLight(int index);
 	void changeMapping();

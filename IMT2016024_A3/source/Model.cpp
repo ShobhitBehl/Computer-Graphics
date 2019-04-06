@@ -1,25 +1,30 @@
 #include "../include/Model.h"
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/string_cast.hpp"
 
 #define PI 3.141592654
 
-Model::Model(){
-    on = 0;
+
+Model::Model(int mn){
+    on = 1;
     selected = 0;
     textureID = 0;
     mappingID = 0;
+    modelnum = mn;
     translation = glm::mat4(1.0);
     rotation = glm::mat4(1.0);
     scale = glm::scale(glm::mat4(1.0), glm::vec3(0.3f, 0.3f, 0.3f));
 };
 
-Model::Model(float x, float y){
-    on = 0;
+Model::Model(float x, float y, int mn, float sc){
+    on = 1;
     selected = 0;
     textureID = 0;
     mappingID = 0;
+    modelnum = mn;
     translation = glm::translate(glm::mat4(1.0), glm::vec3(x, y, 0.0));
     rotation = glm::mat4(1.0);
-    scale = glm::scale(glm::mat4(1.0), glm::vec3(0.45f, 0.45f, 0.45f));
+    scale = glm::scale(glm::mat4(1.0), glm::vec3(sc, sc, sc));
 }
 
 Model::Model(const Model &m){
@@ -31,6 +36,8 @@ Model::Model(const Model &m){
     scale = m.scale;
     num_vertices = m.num_vertices;
     num_indices = m.num_indices;
+    selected = m.selected;
+    on = m.on;
     min_x = m.min_x;
     min_y = m.min_y;
     min_z = m.min_z;
@@ -38,11 +45,24 @@ Model::Model(const Model &m){
     max_y = m.max_y;
     max_z = m.max_z;
     selectPos = m.selectPos;
+    vertices = m.vertices;
+    indices = m.indices;
+    mappingID = m.mappingID;
+    textureID = m.textureID;
+    modelnum = m.modelnum;
+    children = m.children;
+}
+
+void Model::rotate(){
+    rotation = glm::rotate(rotation, 0.01f, glm::vec3(0.0, 1.0, 0.0));
 }
 
 void Model::changeTexture(){
     if(selected == 1){
         textureID = (textureID + 1)%4;
+    }
+    for(int i = 0; i<children.size(); i++){
+        children[i]->changeTexture();
     }
 }
 
@@ -58,21 +78,26 @@ void Model::setScale(glm::mat4 mat){
     scale = mat;
 }
 
-void Model::setSelected(int t, glm::vec3 pos){
+void Model::setSelected(int t, glm::vec3 pos, glm::mat4 worldMatrix){
 
     if(t == 0){
         selected = 0;
-        return;
     }
-    glm::mat4 model = translation*rotation*scale;
-    
-    glm::mat4 inv = glm::inverse(model);
+    else{
+        glm::mat4 model = worldMatrix*translation*rotation*scale;
+        
+        glm::mat4 inv = glm::inverse(model);
 
-    glm::vec4 orig_pos = glm::vec4(inv*glm::vec4(pos,1.0));
+        glm::vec4 orig_pos = glm::vec4(inv*glm::vec4(pos,1.0));
 
-    if(min_x - 0.01 <= orig_pos.x and max_x + 0.01 >= orig_pos.x and min_y - 0.01 <= orig_pos.y and max_y + 0.01 >= orig_pos.y and min_z - 0.01 <= orig_pos.z and max_z + 0.01 >= orig_pos.z){
-        selected = t;
-        selectPos = pos;
+        if(min_x - 0.01 <= orig_pos.x and max_x + 0.01 >= orig_pos.x and min_y - 0.01 <= orig_pos.y and max_y + 0.01 >= orig_pos.y and min_z - 0.01 <= orig_pos.z and max_z + 0.01 >= orig_pos.z){
+            selected = t;
+            selectPos = pos;
+        }
+    }
+    for(int i = 0; i<children.size(); i++)
+    {
+        children[i]->setSelected(t, pos, worldMatrix*translation*rotation*scale);
     }
 }
 
@@ -85,10 +110,21 @@ void Model::scaleModel(int t){
             scale = glm::scale(scale, glm::vec3(0.9f, 0.9f, 0.9f));
         }
     }
+    for(int i = 0; i<children.size(); i++)
+    {
+        children[i]->scaleModel(t);
+    }
 }
 
-void Model::changeLight(){
-    on = !on;
+void Model::changeLight(int index){
+    if(modelnum == index)
+    {
+        on = !on;
+    }
+    for(int i = 0; i<children.size(); i++)
+    {
+        children[i]->changeLight(index);
+    }
 }
 
 void Model::planarTexture(){
@@ -161,6 +197,10 @@ void Model::changeMapping(){
             sphericalTexture();
         }
     }
+    for(int i = 0; i<children.size(); i++)
+    {
+        children[i]->changeMapping();
+    }
 }
 
 void Model::drag(glm::vec3 pos){
@@ -196,8 +236,11 @@ void Model::drag(glm::vec3 pos){
         glm::quat q = glm::angleAxis(glm::radians(angle),glm::normalize(n));
         rotation = glm::mat4_cast(q)*rotation;
     }
-    
     selectPos = pos;
+    for(int i = 0; i<children.size(); i++)
+    {
+        children[i]->drag(pos);
+    }
 }
 
 void Model::calcNormals(){
@@ -403,12 +446,24 @@ void Model::construct(string filename){
     glBindVertexArray(0);
 }
 
-void Model::display(GLuint shaderID, int mode){
+void Model::addChild(Model* m, int index)
+{
+    if(index == modelnum){
+        children.push_back(m);
+    }
+    for(int i = 0; i<children.size(); i++){
+        children[i]->addChild(m, index);
+    }
+}
+
+void Model::display(GLuint shaderID, int mode, glm::mat4 worldMatrix){
+
     if(!mode){
         glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
     }
+
     glm::mat4 model = glm::mat4(1.0);
-    model = translation*rotation*scale;
+    model = worldMatrix*translation*rotation*scale;
     
     GLuint uniformModel = glGetUniformLocation(shaderID, "model");
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
@@ -440,4 +495,7 @@ void Model::display(GLuint shaderID, int mode){
     glDrawElements(GL_TRIANGLES, 3*num_indices, GL_UNSIGNED_INT , nullptr);
     glBindVertexArray(0);
 
+    for(int i = 0; i<children.size(); i++){
+        children[i]->display(shaderID, mode, model);
+    }
 }

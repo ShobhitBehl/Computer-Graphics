@@ -6,24 +6,24 @@ Scene::Scene(){
     lightPos.x = 0;
     lightPos.y = 0;
     lightPos.z = -1.0;
-    num_models = 0;
+    modelnum = 0;
 };
 
 void Scene::setSelected(int t, glm::vec3 pos){
-    for(int i = 0; i<num_models; i++)
+    for(int i = 0; i<models.size(); i++)
     {
-        models[i].setSelected(t, pos);
+        models[i].setSelected(t, pos, glm::mat4(1.0));
     }
 }
 
 void Scene::changeTexture(){
-    for(int i = 0; i<num_models; i++){
+    for(int i = 0; i<models.size(); i++){
         models[i].changeTexture();
     }
 }
 
 void Scene::scale(int t){
-    for(int i = 0; i<num_models; i++)
+    for(int i = 0; i<models.size(); i++)
     {
         models[i].scaleModel(t);
     }
@@ -59,32 +59,41 @@ void Scene::translateLightPos(int mode){
 
 void Scene::changeLight(int index)
 {
-    if(index < num_models)
+    for(int i = 0; i<models.size(); i++)
     {
-        models[index].changeLight();
+        models[i].changeLight(index);
     }
 }
 
 void Scene::drag(glm::vec3 pos){
-    for(int i = 0; i<num_models; i++)
+    for(int i = 0; i<models.size(); i++)
     {
         models[i].drag(pos);
     }
 }
 
 void Scene::changeMapping(){
-    for(int i = 0; i<num_models; i++){
+    for(int i = 0; i<models.size(); i++){
         models[i].changeMapping();
     }
 }
 
-void Scene::addModel(string filename){
-    float x = 0.5, y = 0.5;
-    Model m((num_models - 2)*x + 0.25, 0.0);
+void Scene::addModel(string filename, float x, float y, float sc){
+    Model m(x, y, modelnum, sc);
     m.construct(filename);
-    models[num_models] = m;
-    models[num_models].planarTexture();
-    num_models++;
+    m.planarTexture();
+    models.push_back(m);
+    modelnum++;
+}
+
+void Scene::addChildToModel(int index, string filename, float x, float y, float sc){
+    Model *m = new Model(x, y, modelnum, sc);
+    m->construct(filename);
+    m->planarTexture();
+    for(int i = 0; i<models.size(); i++){
+        models[i].addChild(m, index);
+    }
+    modelnum++;
 }
 
 void Scene::display(GLuint shaderId){
@@ -123,8 +132,9 @@ void Scene::display(GLuint shaderId){
     glDrawArrays(GL_TRIANGLES, 0, 9);
     */
 
-    for(int i = 0; i<num_models; i++){
-        models[i].display(shaderId, 2);
+    for(int i = 0; i<models.size(); i++){
+        models[i].display(shaderId, 2, glm::mat4(1.0));
+        models[i].rotate();
     }
 
     glUseProgram(0);

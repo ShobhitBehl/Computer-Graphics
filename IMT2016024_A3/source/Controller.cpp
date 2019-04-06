@@ -118,10 +118,14 @@ void Controller::display(){
 
 	glEnable(GL_TEXTURE_2D);
 	
-	scene.addModel("./data/beethoven.ply");
-	scene.addModel("./data/cylinder.ply");
-	scene.addModel("./data/sphere.ply");
-	scene.addModel("./data/cube.ply");
+	// scene.addModel("./data/cylinder.ply", -0.75, 0.0, 0.4);
+	// scene.addModel("./data/beethoven.ply", -0.3, 0.0, 0.4);
+	// scene.addModel("./data/sphere.ply", 0.15, 0.0, 0.4);
+	// scene.addModel("./data/cube.ply", 0.7, 0.0, 0.4);
+	scene.addModel("./data/sphere.ply", -0.7, 0.0, 0.2);
+	scene.addChildToModel(0,"./data/cube.ply", 1.2, 0.0, 1.0);
+	// scene.addChildToModel(1, "./data/cylinder.ply", 1.2, 0.0, 1.0);
+	// scene.addChildToModel(2, "./data/beethoven.ply", 1.2, 0.0, 1.0);
 
 	Texture texture1, texture2, texture3, texture4;
 
