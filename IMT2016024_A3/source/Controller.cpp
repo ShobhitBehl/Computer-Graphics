@@ -10,25 +10,7 @@ Controller::Controller(View &v, Scene &s){
 }
 
 void Controller::handleKeys(GLFWwindow* window, int key, int code, int action, int mode){
-	if(key == GLFW_KEY_D and action == GLFW_PRESS){
-		scene.translateLightPos(1);
-	}
-	else if(key == GLFW_KEY_A and action == GLFW_PRESS){
-		scene.translateLightPos(-1);
-	}
-	else if(key == GLFW_KEY_W and action == GLFW_PRESS){
-		scene.translateLightPos(2);
-	}
-	else if(key == GLFW_KEY_S and action == GLFW_PRESS){
-		scene.translateLightPos(-2);
-	}
-	else if(key == GLFW_KEY_E and action == GLFW_PRESS){
-		scene.translateLightPos(-3);
-	}
-	else if(key == GLFW_KEY_Q and action == GLFW_PRESS){
-		scene.translateLightPos(3);
-	}
-	else if(key == GLFW_KEY_MINUS and action == GLFW_PRESS){
+	if(key == GLFW_KEY_MINUS and action == GLFW_PRESS){
 		scene.scale(-1);
 	}
 	else if(key == GLFW_KEY_EQUAL and action == GLFW_PRESS){
@@ -45,6 +27,9 @@ void Controller::handleKeys(GLFWwindow* window, int key, int code, int action, i
 	}
 	else if(key == GLFW_KEY_4 and action == GLFW_PRESS){
 		scene.changeLight(3);
+	}
+	else if(key == GLFW_KEY_5 and action == GLFW_PRESS){
+		scene.changeLight(4);
 	}
 	else if(key == GLFW_KEY_M and action == GLFW_PRESS){
 		scene.changeMapping();
@@ -116,16 +101,30 @@ void Controller::display(){
 	Shader shader("shaders/vert_shader", "shaders/frag_shader");
 	shader.createShader();
 
+	// Camera camera(glm::vec3(0.0f, 0.0f, -2.0f), 150.0f, 1.0f, 0.01f, 100.0f);
+	// glm::mat4 projection = camera.getProjection();
+	// for(int i = 0; i<4; i++){
+	// 	for(int j = 0; j<4; j++){
+	// 		cout << projection[i][j] << " ";
+	// 	}
+	// 	cout << endl;
+	// }
+
 	glEnable(GL_TEXTURE_2D);
-	
-	// scene.addModel("./data/cylinder.ply", -0.75, 0.0, 0.4);
-	// scene.addModel("./data/beethoven.ply", -0.3, 0.0, 0.4);
-	// scene.addModel("./data/sphere.ply", 0.15, 0.0, 0.4);
-	// scene.addModel("./data/cube.ply", 0.7, 0.0, 0.4);
-	scene.addModel("./data/sphere.ply", -0.7, 0.0, 0.2);
-	scene.addChildToModel(0,"./data/cube.ply", 1.2, 0.0, 1.0);
-	// scene.addChildToModel(1, "./data/cylinder.ply", 1.2, 0.0, 1.0);
-	// scene.addChildToModel(2, "./data/beethoven.ply", 1.2, 0.0, 1.0);
+
+	scene.addModel("./data/cube.ply", -0.75, 0.0, 0.4);
+	scene.addModel("./data/cylinder.ply", -0.2, 0.0, 0.4);
+	scene.addModel("./data/sphere.ply", 0.35, 0.0, 0.4);
+	scene.addModel("./data/beethoven.ply", 0.8, 0.0, 0.4);
+	scene.addLight(-0.75, 0.0, -1.0);
+	scene.addLight(-0.2, 0.0, -1.0);
+	scene.addLight(0.35, 0.0, -1.0);
+	scene.addLight(0.8, 0.0, -1.0);
+	// scene.addModel("./data/floor.ply", 0.0, 0.0, 2.0);
+	// scene.addChildToModel(0, "./data/cube.ply", -0.1, 0.1, 0.15);
+	// scene.addChildToModel(0, "./data/cylinder.ply", 0.1, 0.1, 0.15);
+	// scene.addChildToModel(0, "./data/sphere.ply", -0.3, 0.1, 0.15);
+	// scene.addChildToModel(0, "./data/beethoven.ply", 0.3, 0.1, 0.15);
 
 	Texture texture1, texture2, texture3, texture4;
 
@@ -154,7 +153,8 @@ void Controller::display(){
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		scene.display(shader.getshaderID());
+		scene.display(shader.getshaderID(), glm::mat4(1.0));
+		// scene.display(shader.getshaderID(), projection);
 
 		glfwSwapBuffers(mainWindow);
 	}

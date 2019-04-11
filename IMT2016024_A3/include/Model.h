@@ -7,7 +7,7 @@ class Model{
 private:
 	GLuint VAO, VBO, IBO;
 	glm::mat4 translation, rotation, scale;
-	int num_vertices,num_indices,selected,on;
+	int num_vertices,num_indices,selected;
 	float min_x, max_x, min_y, max_y, min_z, max_z;
 	glm::vec3 selectPos;
 	vector <Vertex> vertices;
@@ -25,7 +25,6 @@ public:
 	void setRotation(glm::mat4 mat);
 	void setScale(glm::mat4 mat);
 	void scaleModel(int t);
-	void changeLight(int index);
 	void planarTexture();
 	void cylindricalTexture();
 	void sphericalTexture();
@@ -33,7 +32,7 @@ public:
 	void calcNormals();
 	void splat();
 	void construct(string filename);
-	void display(GLuint shaderId, int mode, glm::mat4 worldMatrix);
+	void display(GLuint shaderId, int mode, glm::mat4 worldMatrix, glm::mat4 projection);
 	void changeMapping();
 	void addChild(Model * m, int index);
 	void rotate();

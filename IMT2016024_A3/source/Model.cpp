@@ -6,7 +6,6 @@
 
 
 Model::Model(int mn){
-    on = 1;
     selected = 0;
     textureID = 0;
     mappingID = 0;
@@ -17,7 +16,6 @@ Model::Model(int mn){
 };
 
 Model::Model(float x, float y, int mn, float sc){
-    on = 1;
     selected = 0;
     textureID = 0;
     mappingID = 0;
@@ -37,7 +35,6 @@ Model::Model(const Model &m){
     num_vertices = m.num_vertices;
     num_indices = m.num_indices;
     selected = m.selected;
-    on = m.on;
     min_x = m.min_x;
     min_y = m.min_y;
     min_z = m.min_z;
@@ -116,17 +113,6 @@ void Model::scaleModel(int t){
     }
 }
 
-void Model::changeLight(int index){
-    if(modelnum == index)
-    {
-        on = !on;
-    }
-    for(int i = 0; i<children.size(); i++)
-    {
-        children[i]->changeLight(index);
-    }
-}
-
 void Model::planarTexture(){
     for(int i = 0; i<num_vertices; i++){
         glm::vec2 tex;
@@ -143,8 +129,8 @@ void Model::cylindricalTexture(){
     for(int i = 0; i<num_vertices; i++){
         glm::vec2 tex;
         glm::vec3 pos = vertices[i].getPosition();
-        tex.x = (PI + atan2(pos.y, pos.x))  / (2*PI);
-        tex.y = (pos.z - min_z) / (max_z - min_z);
+        tex.x = (PI + atan2(pos.z, pos.x))  / (2*PI);
+        tex.y = (pos.y - min_y) / (max_y - min_y);
         vertices[i].setTexture(tex);
     }
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -167,16 +153,16 @@ void Model::sphericalTexture(){
         glm::vec2 tex;
         glm::vec3 pos = vertices[i].getPosition();
 
-        tex.x = acos(-pos.x / radius) / PI;
+        tex.y = (asin(pos.y / radius) + PI/2) / PI;
 
         if(sin(PI * tex.x) == 0){
             tex.y = 1;
         } 
-        else if(pos.y < 0){
-            tex.y = acos(pos.z / (radius * sin(PI * tex.x))) / (2*PI);
+        else if(pos.x < 0){
+            tex.x = acos(pos.z / (radius * sin(PI * tex.y))) / (2*PI);
         }
         else{
-            tex.y = (2*PI - acos(pos.z / (radius * sin(PI * tex.x)))) / (2*PI);
+            tex.x = (2*PI - acos(pos.z / (radius * sin(PI * tex.y)))) / (2*PI);
         }
         vertices[i].setTexture(tex);
     }
@@ -456,46 +442,26 @@ void Model::addChild(Model* m, int index)
     }
 }
 
-void Model::display(GLuint shaderID, int mode, glm::mat4 worldMatrix){
+void Model::display(GLuint shaderID, int mode, glm::mat4 worldMatrix, glm::mat4 projection){
 
     if(!mode){
         glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
     }
 
     glm::mat4 model = glm::mat4(1.0);
-    model = worldMatrix*translation*rotation*scale;
+    model = worldMatrix*projection*translation*rotation*scale;
     
     GLuint uniformModel = glGetUniformLocation(shaderID, "model");
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
-    glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, -1.0f);
-    lightPos = glm::vec3(translation * glm::vec4(lightPos, 1.0f));
-
-    GLuint uniformlightPos = glGetUniformLocation(shaderID, "lightPos");
-    glUniform3fv(uniformlightPos, 1, glm::value_ptr(lightPos));
-
     GLuint uniformTexture = glGetUniformLocation(shaderID, "textureID");
     glUniform1i(uniformTexture, textureID);
-
-    glm::vec3 source;
-
-    if(!on)
-    {
-        source = glm::vec3(0.0f, 0.0f, 0.0f);
-    }
-    else
-    {
-        source = glm::vec3(1.0f, 1.0f, 1.0f);
-    }
-
-    GLuint uniformsource = glGetUniformLocation(shaderID, "source");
-    glUniform3fv(uniformsource, 1, glm::value_ptr(source));
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 3*num_indices, GL_UNSIGNED_INT , nullptr);
     glBindVertexArray(0);
 
     for(int i = 0; i<children.size(); i++){
-        children[i]->display(shaderID, mode, model);
+        children[i]->display(shaderID, mode, model, projection);
     }
 }

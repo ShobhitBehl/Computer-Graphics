@@ -1,6 +1,7 @@
 #include "View.h"
 #include "Scene.h"
 #include "Texture.h"
+#include "Camera.h"
 
 using namespace std;
 

@@ -5,45 +5,48 @@ in vec3 FragPos;
 in vec2 texCoord;
 
 out vec4 FragColor;
-uniform vec3 source;
-uniform vec3 lightPos;
+uniform int on[4];
+uniform vec3 lightPos[4];
 uniform sampler2D textureID;
 
 vec4 objectColor = texture(textureID, texCoord);
-//vec4 objectColor = vec4(0.0, 0.0, 1.0, 1.0);
-//vec4 objectColor = vec4(textureID, 0.0, 0.0, 1.0);
+vec4 temp = vec4(0.0, 0.0, 0.0, 0.0);
 
 void main()
 {
-    if(source.x == 1 && source.y == 1 && source.z == 1)
+    for(int i = 0; i<4; i++)
     {
-        vec3 lightColor = vec3(1.0, 1.0, 1.0);
-        float ambientStrength = 0.4;
-        float diffuseStrength = 0.6;
+        if(on[i] == 1)
+        {
+            vec3 lightColor = vec3(1.0, 1.0, 1.0);
+            float ambientStrength = 0.0;
+            float diffuseStrength = 1.0;
 
-        vec3 lightVector = normalize(lightPos - FragPos);
-        float distance = length(lightPos - FragPos);
+            vec3 lightVector = normalize(lightPos[i] - FragPos);
+            float distance = length(lightPos[i] - FragPos);
 
-        vec3 ambient = lightColor * ambientStrength;
+            vec3 ambient = lightColor * ambientStrength;
 
-        vec3 reflection = reflect(lightVector, Normal);
+            vec3 reflection = reflect(lightVector, Normal);
 
-        float diffuse = max(0, dot(normalize(Normal), lightVector));
+            float diffuse = max(0, dot(normalize(Normal), lightVector));
 
-        float alpha = 100;
+            float alpha = 100;
 
-        vec3 view = vec3(0, 0, 1);
+            vec3 view = vec3(0, 0, 1);
 
-        float specular = pow(max(0, dot(view, reflection)), alpha);
+            float specular = pow(max(0, dot(view, reflection)), alpha);
 
-        float distanceAttenuation = 1/(1 + 0.1 * distance + 0.05 * distance * distance);
+            float distanceAttenuation = 1/(1 + 0.1 * distance + 0.05 * distance * distance);
 
-        FragColor = objectColor * vec4(ambient, 1.0) +
-                    distanceAttenuation * diffuse * objectColor * diffuseStrength +
-                    distanceAttenuation* objectColor * specular;
+            temp = temp + objectColor * vec4(ambient, 1.0) +
+                        distanceAttenuation * diffuse * objectColor * diffuseStrength +
+                        distanceAttenuation* objectColor * specular;
+        }
+        else
+        {
+            temp = temp + objectColor*vec4(0.0, 0.0, 0.0, 1.0f);
+        }
     }
-    else
-    {
-        FragColor = objectColor*vec4(0.1, 0.1, 0.1, 1.0f);
-    }
+    FragColor = temp;
 }
