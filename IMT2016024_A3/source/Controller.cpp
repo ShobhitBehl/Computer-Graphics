@@ -101,30 +101,31 @@ void Controller::display(){
 	Shader shader("shaders/vert_shader", "shaders/frag_shader");
 	shader.createShader();
 
-	// Camera camera(glm::vec3(0.0f, 0.0f, -2.0f), 150.0f, 1.0f, 0.01f, 100.0f);
-	// glm::mat4 projection = camera.getProjection();
-	// for(int i = 0; i<4; i++){
-	// 	for(int j = 0; j<4; j++){
-	// 		cout << projection[i][j] << " ";
-	// 	}
-	// 	cout << endl;
-	// }
-
 	glEnable(GL_TEXTURE_2D);
 
-	scene.addModel("./data/cube.ply", -0.75, 0.0, 0.4);
-	scene.addModel("./data/cylinder.ply", -0.2, 0.0, 0.4);
-	scene.addModel("./data/sphere.ply", 0.35, 0.0, 0.4);
-	scene.addModel("./data/beethoven.ply", 0.8, 0.0, 0.4);
-	scene.addLight(-0.75, 0.0, -1.0);
-	scene.addLight(-0.2, 0.0, -1.0);
-	scene.addLight(0.35, 0.0, -1.0);
-	scene.addLight(0.8, 0.0, -1.0);
+	// scene.addModel("./data/floor.ply", 0.0, -0.1, 2.0);
+	// scene.addModel("./data/cube.ply", -0.75, 0.0, 0.4);
+	// scene.addModel("./data/cylinder.ply", -0.2, 0.0, 0.4);
+	// scene.addModel("./data/sphere.ply", 0.35, 0.0, 0.4);
+	// scene.addModel("./data/beethoven.ply", 0.8, 0.0, 0.4);
+	scene.addLight(-0.6, 0.1, -1.0);
+	scene.addLight(-0.2, 0.1, -1.0);
+	scene.addLight(0.2, 0.1, -1.0);
+	scene.addLight(0.6, 0.1, -1.0);
 	// scene.addModel("./data/floor.ply", 0.0, 0.0, 2.0);
 	// scene.addChildToModel(0, "./data/cube.ply", -0.1, 0.1, 0.15);
 	// scene.addChildToModel(0, "./data/cylinder.ply", 0.1, 0.1, 0.15);
 	// scene.addChildToModel(0, "./data/sphere.ply", -0.3, 0.1, 0.15);
 	// scene.addChildToModel(0, "./data/beethoven.ply", 0.3, 0.1, 0.15);
+
+	scene.addModel("./data/cube.ply", 0.0, 0.0, 0.2);
+	scene.addChildToModel(0, "./data/cylinder.ply", 2.0, 0.0, 1.0);
+	scene.addChildToModel(1, "./data/sphere.ply", 2.0, 0.0, 1.0);
+	scene.addChildToModel(2, "./data/beethoven.ply", 0.0, 1.0, 1.0);
+
+	scene.setMotion(3, 1);
+	scene.setMotion(1, 2);
+	scene.setMotion(2, 3);
 
 	Texture texture1, texture2, texture3, texture4;
 
@@ -138,7 +139,9 @@ void Controller::display(){
 	texture3.bind(2);
 	texture4.bind(3);
     
-    Controller* controller = this;
+	Controller* controller = this;
+	
+	int timer = 0;
 
     while(!glfwWindowShouldClose(mainWindow))
 	{
@@ -153,8 +156,11 @@ void Controller::display(){
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		scene.display(shader.getshaderID(), glm::mat4(1.0));
-		// scene.display(shader.getshaderID(), projection);
+		scene.display(shader.getshaderID());
+		scene.update(timer);
+
+		timer++;
+		timer%=2;
 
 		glfwSwapBuffers(mainWindow);
 	}

@@ -6,7 +6,7 @@ using namespace std;
 class Model{
 private:
 	GLuint VAO, VBO, IBO;
-	glm::mat4 translation, rotation, scale;
+	glm::mat4 revolution, translation, rotation, scale;
 	int num_vertices,num_indices,selected;
 	float min_x, max_x, min_y, max_y, min_z, max_z;
 	glm::vec3 selectPos;
@@ -14,6 +14,8 @@ private:
 	vector <GLuint> indices;
 	int textureID, mappingID, modelnum;
 	vector <Model*> children;
+	int motion;
+	int period;
 
 public:
 	Model(int mn);
@@ -32,8 +34,9 @@ public:
 	void calcNormals();
 	void splat();
 	void construct(string filename);
-	void display(GLuint shaderId, int mode, glm::mat4 worldMatrix, glm::mat4 projection);
+	void display(GLuint shaderId, int mode, glm::mat4 worldMatrix);
 	void changeMapping();
 	void addChild(Model * m, int index);
-	void rotate();
+	void update(int timer, glm::vec3 parent_center, glm::mat4 worldMatrix);
+	void setMotion(int index, int m);
 };

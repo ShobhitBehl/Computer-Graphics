@@ -16,6 +16,29 @@ void Scene::setSelected(int t, glm::vec3 pos){
 void Scene::addLight(float x, float y, float z){
     lightPos.push_back(glm::vec3(x, y, z));
     on.push_back(1);
+    if(lightPos.size() == 1)
+    {
+        glGenVertexArrays(1, &lightVAO);
+        glGenBuffers(1, &lightVBO);
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
+    glBindVertexArray(lightVAO);
+
+    lightTriangles.push_back(x - 0.01);
+    lightTriangles.push_back(y - 0.01);
+    lightTriangles.push_back(z);
+    lightTriangles.push_back(x + 0.01);
+    lightTriangles.push_back(y - 0.01); 
+    lightTriangles.push_back(z);
+    lightTriangles.push_back(x);
+    lightTriangles.push_back(y + 0.01); 
+    lightTriangles.push_back(z);
+
+    glBufferData(GL_ARRAY_BUFFER, lightTriangles.size()*sizeof(float), &lightTriangles[0], GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
 }
 
 void Scene::changeTexture(){
@@ -68,7 +91,7 @@ void Scene::addChildToModel(int index, string filename, float x, float y, float 
     modelnum++;
 }
 
-void Scene::display(GLuint shaderId, glm::mat4 projection){
+void Scene::display(GLuint shaderId){
     glUseProgram(shaderId);
 
     
@@ -83,29 +106,28 @@ void Scene::display(GLuint shaderId, glm::mat4 projection){
     GLuint uniformModel = glGetUniformLocation(shaderId, "model"); 
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
-    // vector <float> light_source = {
-    //     lightPos.x, lightPos.y, lightPos.z,
-    //     lightPos.x + 0.03f, lightPos.y, lightPos.z,
-    //     lightPos.x + 0.015f, lightPos.y + 0.03f, lightPos.z
-    // };
+    GLuint uniformSource = glGetUniformLocation(shaderId, "source");
+    glUniform1i(uniformSource, 1);
 
-    // glGenVertexArrays(1, &lightVAO);
-	// glBindVertexArray(lightVAO);
-
-    // glGenBuffers(1, &lightVBO);
-    // glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
-    // glBufferData(GL_ARRAY_BUFFER, 9*sizeof(float), &light_source[0], GL_STATIC_DRAW);
-
-    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    // glEnableVertexAttribArray(0);
- 
-    // glDrawArrays(GL_TRIANGLES, 0, 9);
+    glBindVertexArray(lightVAO);
+    glDrawArrays(GL_TRIANGLES, 0, lightTriangles.size());
+    glBindVertexArray(0);
 
     for(int i = 0; i<models.size(); i++){
-        // models[i].display(shaderId, 2, glm::mat4(1.0), projection);
-        models[i].display(shaderId, 2, glm::mat4(1.0), glm::mat4(1.0));
-        // models[i].rotate();
+        models[i].display(shaderId, 2, glm::mat4(1.0));
     }
 
     glUseProgram(0);
+}
+
+void Scene::update(int timer){
+    for(int i = 0; i<models.size(); i++){
+        models[i].update(timer, glm::vec3(0.0, 0.0, 0.0), glm::mat4(1.0));
+    }
+}
+
+void Scene::setMotion(int index, int m){
+    for(int i = 0; i<models.size(); i++){
+        models[i].setMotion(index, m);
+    }
 }

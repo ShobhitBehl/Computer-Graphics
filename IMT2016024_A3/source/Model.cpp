@@ -13,6 +13,8 @@ Model::Model(int mn){
     translation = glm::mat4(1.0);
     rotation = glm::mat4(1.0);
     scale = glm::scale(glm::mat4(1.0), glm::vec3(0.3f, 0.3f, 0.3f));
+    motion = 0;
+    period = 0;
 };
 
 Model::Model(float x, float y, int mn, float sc){
@@ -23,6 +25,9 @@ Model::Model(float x, float y, int mn, float sc){
     translation = glm::translate(glm::mat4(1.0), glm::vec3(x, y, 0.0));
     rotation = glm::mat4(1.0);
     scale = glm::scale(glm::mat4(1.0), glm::vec3(sc, sc, sc));
+    revolution = glm::mat4(1.0);
+    motion = 0;
+    period = 0;
 }
 
 Model::Model(const Model &m){
@@ -48,10 +53,9 @@ Model::Model(const Model &m){
     textureID = m.textureID;
     modelnum = m.modelnum;
     children = m.children;
-}
-
-void Model::rotate(){
-    rotation = glm::rotate(rotation, 0.01f, glm::vec3(0.0, 1.0, 0.0));
+    revolution = m.revolution;
+    motion = m.motion;
+    period = m.period;
 }
 
 void Model::changeTexture(){
@@ -154,11 +158,8 @@ void Model::sphericalTexture(){
         glm::vec3 pos = vertices[i].getPosition();
 
         tex.y = (asin(pos.y / radius) + PI/2) / PI;
-
-        if(sin(PI * tex.x) == 0){
-            tex.y = 1;
-        } 
-        else if(pos.x < 0){
+        
+        if(pos.x < 0){
             tex.x = acos(pos.z / (radius * sin(PI * tex.y))) / (2*PI);
         }
         else{
@@ -442,14 +443,14 @@ void Model::addChild(Model* m, int index)
     }
 }
 
-void Model::display(GLuint shaderID, int mode, glm::mat4 worldMatrix, glm::mat4 projection){
+void Model::display(GLuint shaderID, int mode, glm::mat4 worldMatrix){
 
     if(!mode){
         glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
     }
 
     glm::mat4 model = glm::mat4(1.0);
-    model = worldMatrix*projection*translation*rotation*scale;
+    model = revolution*worldMatrix*translation*rotation*scale;
     
     GLuint uniformModel = glGetUniformLocation(shaderID, "model");
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
@@ -457,11 +458,59 @@ void Model::display(GLuint shaderID, int mode, glm::mat4 worldMatrix, glm::mat4 
     GLuint uniformTexture = glGetUniformLocation(shaderID, "textureID");
     glUniform1i(uniformTexture, textureID);
 
+    GLuint uniformSource = glGetUniformLocation(shaderID, "source");
+    glUniform1i(uniformSource, 0);
+
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 3*num_indices, GL_UNSIGNED_INT , nullptr);
     glBindVertexArray(0);
 
     for(int i = 0; i<children.size(); i++){
-        children[i]->display(shaderID, mode, model, projection);
+        children[i]->display(shaderID, mode, worldMatrix*translation*rotation*scale);
+    }
+}
+
+void Model::update(int timer, glm::vec3 parent_center, glm::mat4 worldMatrix){
+    glm::mat4 model = revolution*worldMatrix*translation*rotation*scale;
+    
+    glm::vec3 center = glm::vec3(model*glm::vec4(0.0, 0.0, 0.0, 1.0));
+
+    if(motion == 1){
+        translation = glm::translate(translation, glm::vec3(0.0, 0.025, 0.0));
+        period++;
+        if(period == 20){
+            period = 0;
+            motion = -1;
+        }
+    }
+    else if(motion == -1){
+        translation = glm::translate(translation, glm::vec3(0.0, -0.025, 0.0));
+        period++;
+        if(period == 20){
+            period = 0;
+            motion = 1;
+        }
+    }
+    else if(motion == 2){
+        revolution = glm::rotate(revolution, 0.03f, glm::vec3(0.0, 1.0, 0.0));
+    }
+    else if(motion == 3){
+        glm::vec3 towards = parent_center - center;
+        towards = glm::normalize(towards) / 50.0f;
+        translation = glm::translate(translation, towards);
+    }
+
+    for(int i = 0; i<children.size(); i++){
+        children[i]->update(timer, center ,worldMatrix*translation*rotation*scale);
+    }
+}
+
+void Model::setMotion(int index, int m){
+    if(index == modelnum)
+    {
+        motion = m;
+    }
+    for(int i = 0; i<children.size(); i++){
+        children[i]->setMotion(index, m);
     }
 }

@@ -7,6 +7,7 @@ private:
 	vector <Model> models;
 	vector <glm::vec3> lightPos;
 	vector <int> on;
+	vector <float> lightTriangles;
 	GLuint lightVBO, lightVAO;
 	int modelnum;
 
@@ -18,8 +19,10 @@ public:
 	void drag(glm::vec3 pos);
 	void addModel(string filename, float x, float y, float sc);
 	void addChildToModel(int index, string filename, float x, float y, float sc);
-	void display(GLuint shaderId, glm::mat4 projection);
+	void display(GLuint shaderId);
 	void changeLight(int index);
 	void changeMapping();
 	void addLight(float x, float y, float z);
+	void update(int timer);
+	void setMotion(int index, int m);
 };
