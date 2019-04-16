@@ -7,7 +7,7 @@ class Model{
 private:
 	GLuint VAO, VBO, IBO;
 	glm::mat4 revolution, translation, rotation, scale;
-	int num_vertices,num_indices,selected;
+	int num_vertices, num_indices, selected, rot;
 	float min_x, max_x, min_y, max_y, min_z, max_z;
 	glm::vec3 selectPos;
 	vector <Vertex> vertices;
@@ -39,4 +39,5 @@ public:
 	void addChild(Model * m, int index);
 	void update(int timer, glm::vec3 parent_center, glm::mat4 worldMatrix);
 	void setMotion(int index, int m);
+	void setRotate();
 };

@@ -131,3 +131,9 @@ void Scene::setMotion(int index, int m){
         models[i].setMotion(index, m);
     }
 }
+
+void Scene::setRotate(){
+    for(int i = 0; i<models.size(); i++){
+        models[i].setRotate();
+    }
+}

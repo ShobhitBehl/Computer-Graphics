@@ -37,6 +37,9 @@ void Controller::handleKeys(GLFWwindow* window, int key, int code, int action, i
 	else if(key == GLFW_KEY_T and action == GLFW_PRESS){
 		scene.changeTexture();
 	}
+	else if(key == GLFW_KEY_R and action == GLFW_PRESS){
+		scene.setRotate();
+	}
 }
 
 void Controller::handleClick(GLFWwindow* window, int button, int action, int mods){
@@ -119,7 +122,7 @@ void Controller::display(){
 	// scene.addChildToModel(0, "./data/beethoven.ply", 0.3, 0.1, 0.15);
 
 	scene.addModel("./data/cube.ply", 0.0, 0.0, 0.2);
-	scene.addChildToModel(0, "./data/cylinder.ply", 2.0, 0.0, 1.0);
+	scene.addChildToModel(0, "./data/beethoven.ply", 2.0, 0.0, 1.0);
 	scene.addChildToModel(1, "./data/sphere.ply", 2.0, 0.0, 1.0);
 	scene.addChildToModel(2, "./data/beethoven.ply", 0.0, 1.0, 1.0);
 

@@ -25,4 +25,5 @@ public:
 	void addLight(float x, float y, float z);
 	void update(int timer);
 	void setMotion(int index, int m);
+	void setRotate();
 };

@@ -15,6 +15,7 @@ Model::Model(int mn){
     scale = glm::scale(glm::mat4(1.0), glm::vec3(0.3f, 0.3f, 0.3f));
     motion = 0;
     period = 0;
+    rot = 0;
 };
 
 Model::Model(float x, float y, int mn, float sc){
@@ -28,6 +29,7 @@ Model::Model(float x, float y, int mn, float sc){
     revolution = glm::mat4(1.0);
     motion = 0;
     period = 0;
+    rot = 0;
 }
 
 Model::Model(const Model &m){
@@ -56,6 +58,7 @@ Model::Model(const Model &m){
     revolution = m.revolution;
     motion = m.motion;
     period = m.period;
+    rot = m.rot;
 }
 
 void Model::changeTexture(){
@@ -79,13 +82,23 @@ void Model::setScale(glm::mat4 mat){
     scale = mat;
 }
 
+void Model::setRotate(){
+    if(selected == 1){
+        rot = !rot;
+    }
+    for(int i = 0; i<children.size(); i++)
+    {
+        children[i]->setRotate();
+    }
+}
+
 void Model::setSelected(int t, glm::vec3 pos, glm::mat4 worldMatrix){
 
     if(t == 0){
         selected = 0;
     }
     else{
-        glm::mat4 model = worldMatrix*translation*rotation*scale;
+        glm::mat4 model = revolution*worldMatrix*translation*rotation*scale;
         
         glm::mat4 inv = glm::inverse(model);
 
@@ -98,7 +111,7 @@ void Model::setSelected(int t, glm::vec3 pos, glm::mat4 worldMatrix){
     }
     for(int i = 0; i<children.size(); i++)
     {
-        children[i]->setSelected(t, pos, worldMatrix*translation*rotation*scale);
+        children[i]->setSelected(t, pos, worldMatrix*translation*scale);
     }
 }
 
@@ -466,7 +479,7 @@ void Model::display(GLuint shaderID, int mode, glm::mat4 worldMatrix){
     glBindVertexArray(0);
 
     for(int i = 0; i<children.size(); i++){
-        children[i]->display(shaderID, mode, worldMatrix*translation*rotation*scale);
+        children[i]->display(shaderID, mode, worldMatrix*translation*scale);
     }
 }
 
@@ -500,8 +513,13 @@ void Model::update(int timer, glm::vec3 parent_center, glm::mat4 worldMatrix){
         translation = glm::translate(translation, towards);
     }
 
+    if(rot)
+    {
+        rotation = glm::rotate(rotation, 0.05f, glm::vec3(0.0, 1.0, 0.0));
+    }
+
     for(int i = 0; i<children.size(); i++){
-        children[i]->update(timer, center ,worldMatrix*translation*rotation*scale);
+        children[i]->update(timer, center ,worldMatrix*translation*scale);
     }
 }
 

@@ -7,7 +7,7 @@ class Model{
 private:
 	GLuint VAO, VBO, IBO;
 	glm::mat4 translation, rotation, scale;
-	int num_vertices,num_indices,selected;
+	int num_vertices, num_indices, selected;
 	float min_x, max_x, min_y, max_y, min_z, max_z;
 	glm::vec3 selectPos;
 	vector <Vertex> vertices;
