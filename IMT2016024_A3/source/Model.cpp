@@ -98,7 +98,7 @@ void Model::setSelected(int t, glm::vec3 pos, glm::mat4 worldMatrix){
         selected = 0;
     }
     else{
-        glm::mat4 model = revolution*worldMatrix*translation*rotation*scale;
+        glm::mat4 model = worldMatrix*revolution*translation*rotation*scale;
         
         glm::mat4 inv = glm::inverse(model);
 
@@ -463,7 +463,7 @@ void Model::display(GLuint shaderID, int mode, glm::mat4 worldMatrix){
     }
 
     glm::mat4 model = glm::mat4(1.0);
-    model = revolution*worldMatrix*translation*rotation*scale;
+    model = worldMatrix*revolution*translation*rotation*scale;
     
     GLuint uniformModel = glGetUniformLocation(shaderID, "model");
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
@@ -483,15 +483,15 @@ void Model::display(GLuint shaderID, int mode, glm::mat4 worldMatrix){
     }
 }
 
-void Model::update(int timer, glm::vec3 parent_center, glm::mat4 worldMatrix){
-    glm::mat4 model = revolution*worldMatrix*translation*rotation*scale;
+void Model::update(float speed, glm::vec3 parent_center, glm::mat4 worldMatrix){
+    glm::mat4 model = worldMatrix*revolution*translation*rotation*scale;
     
     glm::vec3 center = glm::vec3(model*glm::vec4(0.0, 0.0, 0.0, 1.0));
 
     if(motion == 1){
         translation = glm::translate(translation, glm::vec3(0.0, 0.025, 0.0));
         period++;
-        if(period == 20){
+        if(period == 20 - int(speed*100.0f)){
             period = 0;
             motion = -1;
         }
@@ -499,27 +499,47 @@ void Model::update(int timer, glm::vec3 parent_center, glm::mat4 worldMatrix){
     else if(motion == -1){
         translation = glm::translate(translation, glm::vec3(0.0, -0.025, 0.0));
         period++;
-        if(period == 20){
+        if(period == 20 - int(speed*100.0f)){
             period = 0;
             motion = 1;
         }
     }
     else if(motion == 2){
-        revolution = glm::rotate(revolution, 0.03f, glm::vec3(0.0, 1.0, 0.0));
+        // cout << center.x << " "<< center.y << " " << center.z << endl;
+        //cout << parent_center.x << " " << parent_center.y << " " << parent_center.z << endl;
+        revolution = glm::rotate(revolution, 0.03f, glm::vec3(0.0, 0.0, 1.0));
+        
+        translation = glm::translate(translation, glm::vec3(0.025, 0.0, 0.0));
+        
+        period++;
+        if(period == 10 - int(speed*100.0f)){
+            period = 0;
+            motion = -2;
+        }
+    }
+    else if(motion == -2){
+        revolution = glm::rotate(revolution, 0.03f + speed, glm::vec3(0.0, 0.0, 1.0));
+
+        translation = glm::translate(translation, glm::vec3(-0.025, 0.0, 0.0));
+        period++;
+        if(period == 10 - int(speed*100.0f)){
+            period = 0;
+            motion = 2;
+        }
     }
     else if(motion == 3){
-        glm::vec3 towards = parent_center - center;
-        towards = glm::normalize(towards) / 50.0f;
+        glm::vec3 towards = glm::vec3(glm::vec4(parent_center - center, 1.0f));
+        towards = glm::normalize(towards) / (50.0f - 100.0f*speed);
         translation = glm::translate(translation, towards);
     }
 
     if(rot)
     {
-        rotation = glm::rotate(rotation, 0.05f, glm::vec3(0.0, 1.0, 0.0));
+        rotation = glm::rotate(rotation, 0.05f + speed, glm::vec3(0.0, 1.0, 0.0));
     }
 
     for(int i = 0; i<children.size(); i++){
-        children[i]->update(timer, center ,worldMatrix*translation*scale);
+        children[i]->update(speed, center ,worldMatrix*translation*scale);
     }
 }
 

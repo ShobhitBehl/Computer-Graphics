@@ -9,6 +9,7 @@ private:
 	vector <int> on;
 	vector <float> lightTriangles;
 	GLuint lightVBO, lightVAO;
+	float speed;
 	int modelnum;
 
 public:
@@ -23,7 +24,8 @@ public:
 	void changeLight(int index);
 	void changeMapping();
 	void addLight(float x, float y, float z);
-	void update(int timer);
+	void update();
 	void setMotion(int index, int m);
 	void setRotate();
+	void changeSpeed(float num);
 };

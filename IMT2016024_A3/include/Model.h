@@ -37,7 +37,7 @@ public:
 	void display(GLuint shaderId, int mode, glm::mat4 worldMatrix);
 	void changeMapping();
 	void addChild(Model * m, int index);
-	void update(int timer, glm::vec3 parent_center, glm::mat4 worldMatrix);
+	void update(float speed, glm::vec3 parent_center, glm::mat4 worldMatrix);
 	void setMotion(int index, int m);
 	void setRotate();
 };

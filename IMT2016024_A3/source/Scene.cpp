@@ -4,6 +4,7 @@ using namespace std;
 
 Scene::Scene(){
     modelnum = 0;
+    speed = 0;
 };
 
 void Scene::setSelected(int t, glm::vec3 pos){
@@ -11,6 +12,11 @@ void Scene::setSelected(int t, glm::vec3 pos){
     {
         models[i].setSelected(t, pos, glm::mat4(1.0));
     }
+}
+
+void Scene::changeSpeed(float num)
+{
+    speed += num;
 }
 
 void Scene::addLight(float x, float y, float z){
@@ -120,9 +126,9 @@ void Scene::display(GLuint shaderId){
     glUseProgram(0);
 }
 
-void Scene::update(int timer){
+void Scene::update(){
     for(int i = 0; i<models.size(); i++){
-        models[i].update(timer, glm::vec3(0.0, 0.0, 0.0), glm::mat4(1.0));
+        models[i].update(speed, glm::vec3(0.0, 0.0, 0.0), glm::mat4(1.0));
     }
 }
 

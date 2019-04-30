@@ -40,6 +40,12 @@ void Controller::handleKeys(GLFWwindow* window, int key, int code, int action, i
 	else if(key == GLFW_KEY_R and action == GLFW_PRESS){
 		scene.setRotate();
 	}
+	else if(key == GLFW_KEY_F and action == GLFW_PRESS){
+		scene.changeSpeed(0.01f);
+	}
+	else if(key == GLFW_KEY_S and action == GLFW_PRESS){
+		scene.changeSpeed(-0.01f);
+	}
 }
 
 void Controller::handleClick(GLFWwindow* window, int button, int action, int mods){
@@ -122,7 +128,7 @@ void Controller::display(){
 	// scene.addChildToModel(0, "./data/beethoven.ply", 0.3, 0.1, 0.15);
 
 	scene.addModel("./data/cube.ply", 0.0, 0.0, 0.2);
-	scene.addChildToModel(0, "./data/beethoven.ply", 2.0, 0.0, 1.0);
+	scene.addChildToModel(0, "./data/cylinder.ply", 2.0, 0.0, 1.0);
 	scene.addChildToModel(1, "./data/sphere.ply", 2.0, 0.0, 1.0);
 	scene.addChildToModel(2, "./data/beethoven.ply", 0.0, 1.0, 1.0);
 
@@ -143,8 +149,6 @@ void Controller::display(){
 	texture4.bind(3);
     
 	Controller* controller = this;
-	
-	int timer = 0;
 
     while(!glfwWindowShouldClose(mainWindow))
 	{
@@ -160,10 +164,7 @@ void Controller::display(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		scene.display(shader.getshaderID());
-		scene.update(timer);
-
-		timer++;
-		timer%=2;
+		scene.update();
 
 		glfwSwapBuffers(mainWindow);
 	}
