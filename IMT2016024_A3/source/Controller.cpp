@@ -117,27 +117,27 @@ void Controller::display(){
 	// scene.addModel("./data/cylinder.ply", -0.2, 0.0, 0.4);
 	// scene.addModel("./data/sphere.ply", 0.35, 0.0, 0.4);
 	// scene.addModel("./data/beethoven.ply", 0.8, 0.0, 0.4);
-	scene.addLight(-0.6, 0.1, -1.0);
-	scene.addLight(-0.2, 0.1, -1.0);
-	scene.addLight(0.2, 0.1, -1.0);
-	scene.addLight(0.6, 0.1, -1.0);
-	// scene.addModel("./data/floor.ply", 0.0, 0.0, 2.0);
 	// scene.addChildToModel(0, "./data/cube.ply", -0.1, 0.1, 0.15);
 	// scene.addChildToModel(0, "./data/cylinder.ply", 0.1, 0.1, 0.15);
 	// scene.addChildToModel(0, "./data/sphere.ply", -0.3, 0.1, 0.15);
 	// scene.addChildToModel(0, "./data/beethoven.ply", 0.3, 0.1, 0.15);
-
+	
 	scene.addModel("./data/cube.ply", 0.0, 0.0, 0.2);
 	scene.addChildToModel(0, "./data/cylinder.ply", 2.0, 0.0, 1.0);
 	scene.addChildToModel(1, "./data/sphere.ply", 2.0, 0.0, 1.0);
 	scene.addChildToModel(2, "./data/beethoven.ply", 0.0, 1.0, 1.0);
-
+	// scene.addModel("./data/floor.ply", 0.0, 0.0, 2.0);
+	
 	scene.setMotion(3, 1);
 	scene.setMotion(1, 2);
 	scene.setMotion(2, 3);
-
+	
 	Texture texture1, texture2, texture3, texture4;
-
+	scene.addLight(0, glm::vec3(0.0f, 0.0f, -1.0f));
+	scene.addLight(1, glm::vec3(0.0f, 0.0f, -1.0f));
+	scene.addLight(2, glm::vec3(0.0f, 0.0f, -1.0f));
+	scene.addLight(3, glm::vec3(0.0f, 0.0f, -1.0f));
+	
 	texture1.create("./textures/wood.jpeg");
 	texture2.create("./textures/chessboard.png");
 	texture3.create("./textures/obama.png");

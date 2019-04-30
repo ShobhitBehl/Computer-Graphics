@@ -23,7 +23,7 @@ public:
 	void display(GLuint shaderId);
 	void changeLight(int index);
 	void changeMapping();
-	void addLight(float x, float y, float z);
+	void addLight(int index, glm::vec3 pos);
 	void update();
 	void setMotion(int index, int m);
 	void setRotate();

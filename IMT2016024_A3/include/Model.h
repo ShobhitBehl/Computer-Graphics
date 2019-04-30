@@ -16,12 +16,18 @@ private:
 	vector <Model*> children;
 	int motion;
 	int period;
+	glm::vec3 lightPos;
+	int on;
+	GLuint lightVAO, lightVBO;
+	vector <float> lightTriangles;
 
 public:
 	Model(int mn);
 	Model(float x, float y, int mn, float sc);
 	Model(const Model &m);
 	void setSelected(int t, glm::vec3 pos, glm::mat4 worldMatrix);
+	void addLight(int index, glm::vec3 pos);
+	void changeLight(int index);
 	void changeTexture();
 	void setTranslation(glm::mat4 mat);
 	void setRotation(glm::mat4 mat);

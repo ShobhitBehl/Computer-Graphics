@@ -464,14 +464,29 @@ void Model::display(GLuint shaderID, int mode, glm::mat4 worldMatrix){
 
     glm::mat4 model = glm::mat4(1.0);
     model = worldMatrix*revolution*translation*rotation*scale;
+
+    GLuint uniformlightPos = glGetUniformLocation(shaderID, "lightPos");
+    glUniform3fv(uniformlightPos, 1 , glm::value_ptr(lightPos));
+
+    GLuint uniformOn = glGetUniformLocation(shaderID, "on");
+    glUniform1iv(uniformOn, 1, &on);
+
+    GLuint uniformModel = glGetUniformLocation(shaderID, "model"); 
+    glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+
+    GLuint uniformSource = glGetUniformLocation(shaderID, "source");
+    glUniform1i(uniformSource, 1);
+
+    glBindVertexArray(lightVAO);
+    glDrawArrays(GL_TRIANGLES, 0, lightTriangles.size());
+    glBindVertexArray(0);
+
     
-    GLuint uniformModel = glGetUniformLocation(shaderID, "model");
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
     GLuint uniformTexture = glGetUniformLocation(shaderID, "textureID");
     glUniform1i(uniformTexture, textureID);
 
-    GLuint uniformSource = glGetUniformLocation(shaderID, "source");
     glUniform1i(uniformSource, 0);
 
     glBindVertexArray(VAO);
@@ -550,5 +565,43 @@ void Model::setMotion(int index, int m){
     }
     for(int i = 0; i<children.size(); i++){
         children[i]->setMotion(index, m);
+    }
+}
+
+void Model::addLight(int index, glm::vec3 pos){
+    if(modelnum == index){
+        lightPos = pos;
+        on = 1;
+        glGenVertexArrays(1, &lightVAO);
+        glGenBuffers(1, &lightVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
+        glBindVertexArray(lightVAO);
+
+        lightTriangles.push_back(pos.x - 0.01);
+        lightTriangles.push_back(pos.y - 0.01);
+        lightTriangles.push_back(pos.z);
+        lightTriangles.push_back(pos.x + 0.01);
+        lightTriangles.push_back(pos.y - 0.01); 
+        lightTriangles.push_back(pos.z);
+        lightTriangles.push_back(pos.x);
+        lightTriangles.push_back(pos.y + 0.01); 
+        lightTriangles.push_back(pos.z);
+
+        glBufferData(GL_ARRAY_BUFFER, lightTriangles.size()*sizeof(float), &lightTriangles[0], GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(0);
+    }
+    for(int i = 0; i<children.size(); i++){
+        children[i]->addLight(index, pos);
+    }
+}
+
+void Model::changeLight(int index){
+    if(modelnum == index){
+        on = !on;
+    }
+    for(int i = 0; i<children.size(); i++){
+        children[i]->changeLight(index);
     }
 }
