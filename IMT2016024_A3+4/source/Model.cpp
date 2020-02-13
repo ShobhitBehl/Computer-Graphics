@@ -503,6 +503,8 @@ void Model::update(float speed, glm::vec3 parent_center, glm::mat4 worldMatrix){
     
     glm::vec3 center = glm::vec3(model*glm::vec4(0.0, 0.0, 0.0, 1.0));
 
+    cout << speed << endl;
+
     if(motion == 1){
         translation = glm::translate(translation, glm::vec3(0.0, 0.025, 0.0));
         period++;
@@ -520,8 +522,6 @@ void Model::update(float speed, glm::vec3 parent_center, glm::mat4 worldMatrix){
         }
     }
     else if(motion == 2){
-        // cout << center.x << " "<< center.y << " " << center.z << endl;
-        //cout << parent_center.x << " " << parent_center.y << " " << parent_center.z << endl;
         revolution = glm::rotate(revolution, 0.03f, glm::vec3(0.0, 0.0, 1.0));
         
         translation = glm::translate(translation, glm::vec3(0.025, 0.0, 0.0));
